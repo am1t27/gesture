@@ -1,0 +1,45 @@
+HOW TO RUN
+==========
+
+1. One-time setup (from the "Source Code" folder):
+
+   python3 -m venv .venv
+   .venv/bin/pip install -r requirements.txt
+
+2. Start the web dashboard:
+
+   .venv/bin/python app.py
+
+   Open http://localhost:5000 — register/login, then use
+   "Start Vocalization" (or the Tutorial page) to launch the
+   camera app in scanSingle / scanSent / createGest mode.
+
+3. Desktop app can also run standalone:
+
+   .venv/bin/python Dashboard.py
+   .venv/bin/python Dashboard.py --mode scanSent
+
+macOS NOTE — camera permission:
+The FIRST time the camera opens, macOS asks for permission and
+attributes it to the app that launched the process (normally
+Terminal). Run app.py from your own Terminal and click "OK" on the
+prompt. If you accidentally denied it: System Settings > Privacy &
+Security > Camera > enable Terminal, then relaunch.
+
+Keys in Scan Sentence mode:
+  c  = capture the currently recognized letter into the sentence
+
+Getting good recognition:
+- Use a plain background and make sure your hand and the wall differ in
+  brightness. The mask panel should show a clean white hand on black.
+- The threshold is chosen automatically (Otsu). Only switch the mask
+  panel to manual if the automatic mask looks wrong.
+- Hold each shape still for a moment. A letter is only reported once it
+  wins a majority of the recent frames, so it will not flicker.
+- An orange box means no hand was detected in it.
+
+Notes:
+- No TensorFlow required. model_compat.py runs ASLModel.h5 with numpy.
+  Verified at 100% on Dataset/test_set.
+- Custom gestures are saved to SampleGestures/ and matched by silhouette
+  overlap (IoU), which is far more reliable on binary masks than SIFT.

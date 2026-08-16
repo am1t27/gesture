@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign in — Gesture Vocalization</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='ui.css') }}">
+</head>
+<body>
+    <div class="auth-wrap">
+        <div class="auth-brand">
+            <div class="brand-mark">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="15" height="15">
+                    <path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/>
+                    <path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/>
+                </svg>
+            </div>
+            Gesture Vocalization
+        </div>
+
+        <div class="auth-card rise">
+            <!-- Sign in -->
+            <div id="loginView" class="view active">
+                <h1>Sign in</h1>
+                <p class="auth-sub">Sign language to speech, in real time.</p>
+
+                {% if login_error %}<div class="form-error">{{ login_error }}</div>{% endif %}
+                <div id="login-feedback" class="form-error"></div>
+
+                <form action="/login" method="POST" novalidate onsubmit="return handleLogin(event)">
+                    <div class="field">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" name="email" autocomplete="email" required>
+                    </div>
+                    <div class="field">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" name="pswd" autocomplete="current-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="loginBtn">Sign in</button>
+                </form>
+
+                <p class="auth-alt">New here? <button onclick="switchView('registerView')">Create an account</button></p>
+            </div>
+
+            <!-- Create account -->
+            <div id="registerView" class="view">
+                <h1>Create your account</h1>
+                <p class="auth-sub">A workspace for your sessions and custom gestures.</p>
+
+                <div id="signup-feedback" class="form-error"></div>
+
+                <form action="/register" method="POST" novalidate onsubmit="return handleSignup(event)">
+                    <div class="field">
+                        <label for="signup-name">Name</label>
+                        <input type="text" id="signup-name" name="txt" autocomplete="name" required>
+                    </div>
+                    <div class="field">
+                        <label for="signup-email">Email</label>
+                        <input type="email" id="signup-email" name="email" autocomplete="email" required>
+                    </div>
+                    <div class="field">
+                        <label for="signup-password">Password</label>
+                        <input type="password" id="signup-password" name="pswd" autocomplete="new-password" required>
+                        <p class="hint">6–16 characters, with one uppercase letter and one symbol.</p>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="regBtn">Create account</button>
+                </form>
+
+                <p class="auth-alt">Already have an account? <button onclick="switchView('loginView')">Sign in</button></p>
+            </div>
+        </div>
+
+        <p class="auth-foot">Runs entirely on this computer — camera, model, and data stay local.</p>
+    </div>
+
+    <script>
+        function switchView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            document.getElementById('login-feedback').textContent = '';
+            document.getElementById('signup-feedback').textContent = '';
+        }
+
+        {% if login_error %}
+        // Server-side errors from /register should reopen the register view
+        {% endif %}
+
+        function handleLogin(event) {
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+            const feedback = document.getElementById('login-feedback');
+
+            if (!email || !password) {
+                feedback.textContent = 'Enter your email and password.';
+                event.preventDefault();
+                return false;
+            }
+            const btn = document.getElementById('loginBtn');
+            btn.textContent = 'Signing in…';
+            btn.disabled = true;
+            return true;
+        }
+
+        function handleSignup(event) {
+            const name = document.getElementById('signup-name').value.trim();
+            const email = document.getElementById('signup-email').value.trim();
+            const password = document.getElementById('signup-password').value;
+            const feedback = document.getElementById('signup-feedback');
+
+            if (!name || !email || !password) {
+                feedback.textContent = 'Fill in all three fields.';
+                event.preventDefault();
+                return false;
+            }
+            const problems = [];
+            if (password.length < 6 || password.length > 16) problems.push('Password must be 6–16 characters.');
+            if (!/[A-Z]/.test(password)) problems.push('Add one uppercase letter.');
+            if (!/[^A-Za-z0-9]/.test(password)) problems.push('Add one symbol.');
+            if (problems.length) {
+                feedback.textContent = problems.join(' ');
+                event.preventDefault();
+                return false;
+            }
+            const btn = document.getElementById('regBtn');
+            btn.textContent = 'Creating account…';
+            btn.disabled = true;
+            return true;
+        }
+    </script>
+</body>
+</html>

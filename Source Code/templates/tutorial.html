@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% set active = 'tutorial' %}
+{% set username = current_user %}
+{% block title %}How to use — Gesture Vocalization{% endblock %}
+
+{% block content %}
+<div class="page-head rise">
+    <h1>How to use</h1>
+    <p>Three camera modes, one workflow: keep your hand inside the green box, hold each shape steady, and watch the letter appear.</p>
+</div>
+
+<div class="steps rise">
+    <div class="step">
+        <span class="step-key">1</span>
+        <div>
+            <h3>Set up your camera</h3>
+            <p>Sit with a plain background behind your hand, and keep the hand and the wall clearly different in brightness. The threshold is chosen for you — check the mask panel shows a clean white hand on black. If it doesn't, switch that panel to manual and adjust.</p>
+        </div>
+    </div>
+
+    <div class="step">
+        <span class="step-key">2</span>
+        <div>
+            <h3>Scan one letter</h3>
+            <p>Hold a hand shape inside the green box. The letter appears once the shape holds still for a few frames, with a confidence figure beneath it. The box turns orange when no hand is detected.</p>
+            <button class="btn btn-secondary" onclick="launchMode('scanSingle')">Open scan one letter</button>
+        </div>
+    </div>
+
+    <div class="step">
+        <span class="step-key">3</span>
+        <div>
+            <h3>Build a sentence</h3>
+            <p>Sign a letter, then press <kbd>C</kbd> to add it to your sentence. Add a saved space gesture between words. When you're done, save the sentence — it's stored in your history and can be spoken aloud and exported from the desktop app.</p>
+            <button class="btn btn-secondary" onclick="launchMode('scanSent')">Open build a sentence</button>
+        </div>
+    </div>
+
+    <div class="step">
+        <span class="step-key">4</span>
+        <div>
+            <h3>Teach a custom gesture</h3>
+            <p>Show the engine a new hand shape, give it a name, and save it. From then on it's recognized alongside the standard alphabet.</p>
+            <button class="btn btn-secondary" onclick="launchMode('createGest')">Open teach a gesture</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

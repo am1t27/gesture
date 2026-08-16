@@ -1,0 +1,41 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+.env
+.venv
+*.db
+*.sqlite3
+
+# Datasets and Media
+Dataset/
+SampleGestures/
+TempGest/
+*.mp4
+*.avi
+*.png
+!template.png
+!icons/*.png
+
+# IDE and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets
+.flask_secret
+
+# Temp files
+temp.txt
+*.log
+scratch_clean.py
+patch*.py
+fix*.py
+test*.py
+migrate_layouts.py
+*.db-shm
+*.db-wal

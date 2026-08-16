@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% set active = 'dashboard' %}
+{% block title %}Dashboard — Gesture Vocalization{% endblock %}
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+{% endblock %}
+
+{% block content %}
+<section class="card hero-card rise">
+    <h1>{{ greeting }}, {{ username }}</h1>
+    <p>Sign in front of the camera, and the recognition engine turns each hand shape into a letter — then into sentences you can hear and export.</p>
+
+    <div class="pipeline" aria-hidden="true">
+        <div class="pipe-node">
+            <div class="pipe-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/><path d="M2 8a2 2 0 0 1 2-2h1.5l1.5-2h10l1.5 2H20a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2z"/></svg></div>
+            <span>Camera</span>
+        </div>
+        <div class="pipe-wire"></div>
+        <div class="pipe-node live">
+            <div class="pipe-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 11V6a2 2 0 0 0-4 0v5M14 10V4a2 2 0 0 0-4 0v6M10 10.5V6a2 2 0 0 0-4 0v8"/><path d="M18 8a2 2 0 1 1 4 0v6a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15"/></svg></div>
+            <span>Recognition</span>
+        </div>
+        <div class="pipe-wire"></div>
+        <div class="pipe-node">
+            <div class="pipe-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></div>
+            <span>Text</span>
+        </div>
+        <div class="pipe-wire"></div>
+        <div class="pipe-node">
+            <div class="pipe-dot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></div>
+            <span>Speech</span>
+        </div>
+    </div>
+
+    <div class="hero-actions">
+        <button class="btn btn-primary" onclick="launchMode('scanSent')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Start a session
+        </button>
+        <a href="/history" class="btn btn-secondary">View history</a>
+    </div>
+</section>
+
+<section class="stats rise" style="margin-top: 20px;">
+    <div class="stat">
+        <div class="stat-label">Sessions</div>
+        <div class="stat-value" id="stat-sessions">{{ total_sessions }}</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Letters recognized</div>
+        <div class="stat-value" id="stat-gestures">{{ total_gestures }}</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Sentences saved</div>
+        <div class="stat-value" id="stat-saved">{{ total_sentences }}</div>
+    </div>
+    <div class="stat">
+        <div class="stat-label">Custom gestures</div>
+        <div class="stat-value">{{ custom_gestures }}</div>
+    </div>
+</section>
+
+<div class="grid-2 rise" style="margin-top: 20px;">
+    <div class="col">
+        <div class="card">
+            <div class="card-head">
+                <h2>Letters per session</h2>
+            </div>
+            <div class="chart-box">
+                <canvas id="activityChart"></canvas>
+                <div id="chart-empty" class="empty" style="display:none;">
+                    <strong>No sessions yet</strong>
+                    Run your first scan and results will chart here.
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head">
+                <h2>Recent sessions</h2>
+                <a class="link" href="/history">View all</a>
+            </div>
+            <div class="table-wrap">
+                <table class="data">
+                    <thead>
+                        <tr>
+                            <th>Mode</th>
+                            <th>Recognized</th>
+                            <th>Letters</th>
+                            <th>When</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-sessions-list">
+                        <tr><td colspan="4" class="empty">Loading…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col">
+        <div class="card">
+            <div class="card-head"><h2>Recognition engine</h2></div>
+            <div class="card-body">
+                <div class="kv"><span class="k">Status</span><span class="v" id="model-status-text"><span class="status-dot off"></span>Checking</span></div>
+                <div class="kv"><span class="k">Model</span><span class="v mono">ASLModel.h5</span></div>
+                <div class="kv"><span class="k">Classes</span><span class="v" id="model-classes">—</span></div>
+                <div class="kv"><span class="k">Size</span><span class="v num" id="model-size">—</span></div>
+                <div class="kv"><span class="k">Inference</span><span class="v">NumPy CNN + SIFT</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-head"><h2>Camera modes</h2></div>
+            <div class="card-body" style="display: flex; flex-direction: column; gap: 8px;">
+                <button class="btn btn-secondary" onclick="launchMode('scanSingle')" style="justify-content: flex-start;">Scan one letter</button>
+                <button class="btn btn-secondary" onclick="launchMode('scanSent')" style="justify-content: flex-start;">Build a sentence</button>
+                <button class="btn btn-secondary" onclick="launchMode('createGest')" style="justify-content: flex-start;">Teach a custom gesture</button>
+                <p style="margin: 6px 0 0; font-size: 12.5px; color: var(--ink-3);">Each mode opens the camera window on your desktop.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='dashboard.js') }}"></script>
+{% endblock %}

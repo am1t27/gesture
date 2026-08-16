@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% set active = 'learn' %}
+{% set username = current_user %}
+{% block title %}Learn the alphabet — Gesture Vocalization{% endblock %}
+
+{% block content %}
+<div class="page-head rise">
+    <h1>The ASL alphabet</h1>
+    <p>These are the hand shapes the engine recognizes — one for each letter. Practice a shape, then try it in front of the camera with Scan one letter.</p>
+</div>
+
+{% if gestures %}
+<div class="letter-grid rise">
+    {% for g in gestures %}
+    <figure class="letter-card" style="margin: 0;">
+        <img src="{{ g.image }}" alt="ASL hand shape for the letter {{ g.letter }}" loading="lazy">
+        <figcaption>{{ g.letter }}</figcaption>
+    </figure>
+    {% endfor %}
+</div>
+{% else %}
+<div class="card rise">
+    <div class="empty">
+        <strong>No reference images found</strong>
+        Add letter images to static/images/gestures/ to build this page.
+    </div>
+</div>
+{% endif %}
+{% endblock %}

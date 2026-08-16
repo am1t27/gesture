@@ -1,0 +1,13 @@
+# Web dashboard
+flask>=3.0
+werkzeug>=3.0
+
+# Recognition engine (no TensorFlow needed — model_compat.py runs the CNN in numpy)
+numpy
+h5py
+pillow
+opencv-python
+
+# Desktop app
+PyQt5
+pyttsx3

@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% set active = 'history' %}
+{% block title %}History — Gesture Vocalization{% endblock %}
+
+{% block content %}
+<div class="page-head rise">
+    <h1>History</h1>
+    <p>Every completed recognition session, newest first. Letters are shown exactly as the engine recognized them.</p>
+</div>
+
+<div class="filters rise">
+    <button class="filter-chip active" data-filter="all">All</button>
+    <button class="filter-chip" data-filter="scanSent">Sentences</button>
+    <button class="filter-chip" data-filter="scanSingle">Single letters</button>
+    <button class="filter-chip" data-filter="createGest">Gesture training</button>
+</div>
+
+<div class="card rise">
+    <div class="table-wrap">
+        <table class="data">
+            <thead>
+                <tr>
+                    <th>Mode</th>
+                    <th>Recognized</th>
+                    <th>Letters</th>
+                    <th>Duration</th>
+                    <th>When</th>
+                </tr>
+            </thead>
+            <tbody id="history-list">
+                <tr><td colspan="5" class="empty">Loading…</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const MODE_META = {
+    scanSent:   { label: 'Sentence',  cls: 'mode-tag sent' },
+    scanSingle: { label: 'Single',    cls: 'mode-tag' },
+    createGest: { label: 'Training',  cls: 'mode-tag' },
+};
+
+let allSessions = [];
+
+function chipify(letters) {
+    if (!letters) return '<span class="dim">—</span>';
+    return '<div class="chips">' + [...letters].slice(0, 24).map(ch =>
+        ch === ' ' ? '<span class="chip space">␣</span>'
+                   : `<span class="chip">${ch.replace('<','&lt;')}</span>`
+    ).join('') + (letters.length > 24 ? '<span class="chip space">…</span>' : '') + '</div>';
+}
+
+function fmtDuration(start, end) {
+    if (!start || !end) return '—';
+    const s = Math.max(0, Math.round((new Date(end) - new Date(start)) / 1000));
+    return s >= 60 ? `${Math.floor(s / 60)}m ${s % 60}s` : `${s}s`;
+}
+
+function fmtWhen(iso) {
+    const d = new Date(iso);
+    const today = new Date();
+    const opts = { hour: 'numeric', minute: '2-digit' };
+    if (d.toDateString() === today.toDateString()) return 'Today, ' + d.toLocaleTimeString([], opts);
+    return d.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ', ' + d.toLocaleTimeString([], opts);
+}
+
+function renderHistory(filter) {
+    const rows = filter === 'all' ? allSessions : allSessions.filter(s => s.screen === filter);
+    const el = document.getElementById('history-list');
+    if (rows.length === 0) {
+        el.innerHTML = `<tr><td colspan="5"><div class="empty"><strong>Nothing here yet</strong>Completed sessions will appear in this list.</div></td></tr>`;
+        return;
+    }
+    el.innerHTML = rows.map(s => {
+        const meta = MODE_META[s.screen] || { label: s.screen || '—', cls: 'mode-tag' };
+        return `<tr>
+            <td><span class="${meta.cls}">${meta.label}</span></td>
+            <td>${chipify(s.letters)}</td>
+            <td class="num">${s.gesture_count}</td>
+            <td class="num dim">${fmtDuration(s.started_at, s.ended_at)}</td>
+            <td class="dim">${fmtWhen(s.started_at)}</td>
+        </tr>`;
+    }).join('');
+}
+
+fetch('/api/sessions')
+    .then(r => r.status === 401 ? (window.location.href = '/') : r.json())
+    .then(sessions => {
+        allSessions = sessions || [];
+        renderHistory('all');
+    })
+    .catch(() => {
+        document.getElementById('history-list').innerHTML =
+            '<tr><td colspan="5"><div class="empty"><strong>Could not load history</strong>Check that the server is running, then reload.</div></td></tr>';
+    });
+
+document.querySelectorAll('.filter-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        renderHistory(chip.dataset.filter);
+    });
+});
+</script>
+{% endblock %}

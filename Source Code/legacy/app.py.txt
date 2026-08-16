@@ -1,0 +1,25 @@
+from flask import Flask, render_template, request, redirect, url_for
+import subprocess
+import os
+
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return render_template('register.html')
+
+@app.route('/login', methods=['POST'])
+def login():
+    email = request.form.get('email')
+    password = request.form.get('pswd')
+
+    # Validate login credentials using localStorage or backend storage
+    # For this example, we'll skip validation for simplicity
+
+    # Run the Dashboard.py GUI
+    subprocess.Popen(['python', 'Dashboard.py'], shell=True)
+
+    return 'Launching Sign Language Recognition App...'
+
+if __name__ == '__main__':
+    app.run(debug=True)

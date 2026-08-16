@@ -1,0 +1,241 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+   Gesture Vocalization — Login / Signup Page
+   ───────────────────────────────────────────────────────────────────────────── */
+:root {
+    --bg-deep:        #0F0C29;
+    --bg-mid:         #302b63;
+    --bg-light:       #24243e;
+    --card-bg:        #1A1535;
+    --card-inner:     #130F28;
+    --panel-login:    #110E24;
+
+    --purple-primary: #6C3BFF;
+    --purple-accent:  #8B5CF6;
+
+    --text-primary:   #ffffff;
+    --text-muted:     rgba(255,255,255,0.45);
+
+    --success:        #22C55E;
+    --error:          #EF4444;
+
+    --border:         rgba(255,255,255,0.08);
+    --radius:         18px;
+    --radius-sm:      10px;
+    --shadow:         0 24px 64px rgba(0,0,0,0.55);
+    --transition:     0.45s cubic-bezier(.77,0,.175,1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Jost', sans-serif;
+    background: linear-gradient(135deg, var(--bg-deep) 0%, var(--bg-mid) 60%, var(--bg-light) 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+}
+
+/* ── Brand ───────────────────────────────────────────────────────────────────── */
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-primary);
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    margin-bottom: 24px;
+}
+.brand-icon { width: 26px; height: 26px; color: var(--purple-accent); }
+
+/* ── Card wrapper ─────────────────────────────────────────────────────────────── */
+.main {
+    position: relative;
+    width: clamp(300px, 88vw, 400px);
+    /* Fixed height so the sliding panel clips correctly */
+    height: 520px;
+    background: linear-gradient(160deg, var(--card-bg), var(--card-inner));
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;   /* clips the sliding login panel */
+}
+
+/* ── Toggler checkbox ─────────────────────────────────────────────────────────── */
+#chk { display: none; }
+
+/* ── Signup panel — static, always at top of .main ──────────────────────────── */
+.signup {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    padding: 36px 32px 28px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+}
+
+/* ── Login panel — sits BELOW .main initially, slides up on check ────────────── */
+.login {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 100%;
+    padding: 36px 32px 28px;
+    background: var(--panel-login);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    /* Start hidden below the card */
+    transform: translateY(100%);
+    transition: transform var(--transition);
+}
+
+/* When checkbox is checked, slide login panel up into view */
+#chk:checked ~ .login {
+    transform: translateY(0);
+}
+
+/* ── Screen-reader only ───────────────────────────────────────────────────────── */
+.sr-only {
+    position: absolute; width: 1px; height: 1px;
+    padding: 0; margin: -1px; overflow: hidden;
+    clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ── Panel heading / toggle ──────────────────────────────────────────────────── */
+.panel-toggle {
+    display: block;
+    text-align: center;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    letter-spacing: 0.01em;
+    margin-bottom: 24px;
+    cursor: pointer;
+    user-select: none;
+}
+.panel-toggle small {
+    display: block;
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 0;
+}
+
+/* ── Input fields ─────────────────────────────────────────────────────────────── */
+.field { margin-bottom: 13px; }
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 14px;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 0.93rem;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+}
+input::placeholder { color: var(--text-muted); }
+input:focus {
+    border-color: var(--purple-accent);
+    background: rgba(255,255,255,0.1);
+    box-shadow: 0 0 0 3px rgba(139,92,246,0.18);
+}
+
+.hint {
+    display: block;
+    font-size: 0.71rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+    padding-left: 2px;
+}
+
+/* ── Feedback messages ────────────────────────────────────────────────────────── */
+.feedback {
+    display: none;
+    border-radius: var(--radius-sm);
+    padding: 9px 12px;
+    font-size: 0.83rem;
+    font-weight: 500;
+    margin-bottom: 10px;
+}
+.feedback.success {
+    display: block;
+    background: rgba(34,197,94,0.14);
+    border: 1px solid rgba(34,197,94,0.35);
+    color: var(--success);
+}
+.feedback.error {
+    display: block;
+    background: rgba(239,68,68,0.12);
+    border: 1px solid rgba(239,68,68,0.35);
+    color: var(--error);
+}
+
+/* ── Submit buttons ───────────────────────────────────────────────────────────── */
+button[type="submit"] {
+    width: 100%;
+    padding: 13px;
+    margin-top: 6px;
+    background: var(--purple-primary);
+    color: #fff;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    cursor: pointer;
+    transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
+}
+button[type="submit"]:hover:not(:disabled) {
+    background: var(--purple-accent);
+    box-shadow: 0 6px 20px rgba(108,59,255,0.4);
+}
+button[type="submit"]:active:not(:disabled) { transform: scale(0.98); }
+button[type="submit"]:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* ── Switch link ──────────────────────────────────────────────────────────────── */
+.switch-link {
+    text-align: center;
+    margin-top: 16px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.switch-link label {
+    color: var(--purple-accent);
+    font-weight: 600;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+.switch-link label:hover { color: #fff; }
+
+/* ── Divider ──────────────────────────────────────────────────────────────────── */
+.divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 14px 0;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+}
+
+/* ── Responsive ───────────────────────────────────────────────────────────────── */
+@media (min-width: 640px) {
+    .main { width: clamp(360px, 38vw, 420px); height: 530px; }
+}
